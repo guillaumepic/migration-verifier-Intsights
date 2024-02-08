@@ -583,7 +583,84 @@ func mismatchResultsToVerificationResults(mismatch *MismatchDetails, srcClientDo
 	return
 }
 
+
+	
+func ZoneFieldPermutations() []string {
+	return []string{
+		"Zone",
+		"zone",
+		"accountZone",
+	}
+}
+
+func handleZoneFieldFromOplog(
+	ParsedDoc bson.D,
+) bson.D {
+	ConvertedDoc := handleZoneField(ParsedDoc.Map())
+
+	DocWithLocation := bson.D{}
+
+	for key, value := range ConvertedDoc {
+		DocWithLocation = append(DocWithLocation, bson.D{{key, value}}...)
+	}
+
+	return DocWithLocation
+}
+
+func handleZoneField(
+	ParsedDoc bson.M,
+) bson.M {
+	for _, ZoneFieldPermutation := range ZoneFieldPermutations() {
+		if val, ok := ParsedDoc[ZoneFieldPermutation]; ok {
+			ZoneStr := strings.ToUpper(val.(string))
+
+			switch ZoneStr {
+			case "EU":
+				ZoneStr = "ES"
+			case "ASIA":
+				ZoneStr = "JP"
+			default:
+			}
+
+			ParsedDoc["location"] = ZoneStr
+			delete(ParsedDoc, ZoneFieldPermutation)
+
+			break
+
+		}
+	}
+
+	return ParsedDoc
+}
+
+
+
 func (verifier *Verifier) compareOneDocument(srcClientDoc, dstClientDoc bson.Raw, namespace string) ([]VerificationResult, error) {
+
+	// Patching -- GPI
+    //var srcDoc, dstDoc bson.M
+	var srcDoc bson.M
+    if err := bson.Unmarshal(srcClientDoc, &srcDoc); err != nil {
+        return nil, err
+    }
+    // if err := bson.Unmarshal(dstClientDoc, &dstClientDoc); err != nil {
+    //     return nil, err
+    // }
+
+    handleZoneField(srcDoc)
+    // handleZoneField(dstDoc)
+
+    srcClientDoc, err := bson.Marshal(srcDoc)
+    if err != nil {
+        return nil, err
+    }
+    // dstClientDoc, err = bson.Marshal(dstDoc)
+    // if err != nil {
+    //     return nil, err
+    // }
+	// Patching GPI - end
+
+
 	match := bytes.Equal(srcClientDoc, dstClientDoc)
 	if match {
 		return nil, nil
