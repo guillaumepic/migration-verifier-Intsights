@@ -142,7 +142,6 @@ func main() {
 	// Patching Zone field
 	handleZoneField(resultSrc)
 
-	log.Print("Results to Marshal now")
 	jsonDataSrc, err := json.MarshalIndent(resultSrc, "", "    ")
 	if err != nil {
 		panic(err)
@@ -158,20 +157,26 @@ func main() {
 	fmt.Printf("%s\n", jsonDataDest)
 
 	// Byte comparison
-	srcDoc, err := bson.Marshal(resultSrc)
+	var srcDoc, destDoc []byte
+	srcDoc, err = bson.Marshal(resultSrc)
 	if err != nil {
 		log.Fatal("Error Marshalling doc +s", err)
 		return
 	}
-	destDoc, err := bson.Marshal(resultDest)
+	destDoc, err = bson.Marshal(resultDest)
 	if err != nil {
 		log.Fatal("Error Marshalling doc +s", err)
 		return
 	}
 	// Byte comparison
+	fmt.Printf("Raw resultSrc : %08b\n", srcDoc)
+	fmt.Printf("Raw resultDest : %08b\n", destDoc)
 	log.Print("Length of src document after patching:", len(srcDoc))
 	log.Print("Length of dest document :", len(destDoc))
-	match := bytes.Equal(srcDoc, destDoc)
+
+	var match bool
+	match = bytes.Equal(srcDoc, destDoc)
+
 	log.Print("Match result is ", match)
 	if match {
 		log.Print("Both documents are equal in byte size")
