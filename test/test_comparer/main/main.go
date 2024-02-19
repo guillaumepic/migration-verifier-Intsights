@@ -178,11 +178,11 @@ func main() {
 	log.Print("Length of src document after patching:", len(srcDoc))
 	log.Print("Length of dest document :", len(destDoc))
 
-	sort.Slice(srcDoc, func(i, j int) bool { // sorted src []byte
+	sort.SliceStable(srcDoc, func(i, j int) bool { // sorted src []byte
 		return srcDoc[i] > srcDoc[j]
 	})
 
-	sort.Slice(destDoc, func(i, j int) bool { //sorted dest []byte
+	sort.SliceStable(destDoc, func(i, j int) bool { //sorted dest []byte
 		return destDoc[i] > destDoc[j]
 	})
 
