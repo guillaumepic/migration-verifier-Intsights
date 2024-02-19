@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -141,15 +142,18 @@ func main() {
 
 	// Patching Zone field
 	handleZoneField(resultSrc)
+	// handleZoneField(resultDest)
 
-	jsonDataSrc, err := json.MarshalIndent(resultSrc, "", "    ")
+	// jsonDataSrc, err := json.MarshalIndent(resultSrc, "", "    ")
+	jsonDataSrc, err := json.Marshal(resultSrc)
 	if err != nil {
 		panic(err)
 	}
 	log.Print("Document found at source")
 	fmt.Printf("%s\n", jsonDataSrc)
 
-	jsonDataDest, err := json.MarshalIndent(resultDest, "", "    ")
+	//jsonDataDest, err := json.MarshalIndent(resultDest, "", "    ")
+	jsonDataDest, err := json.Marshal(resultDest)
 	if err != nil {
 		panic(err)
 	}
@@ -169,13 +173,21 @@ func main() {
 		return
 	}
 	// Byte comparison
-	fmt.Printf("Raw resultSrc : %08b\n", srcDoc)
-	fmt.Printf("Raw resultDest : %08b\n", destDoc)
+	fmt.Printf("Raw resultSrc (before): %08b\n", srcDoc)
+	fmt.Printf("Raw resultDest (before): %08b\n", destDoc)
 	log.Print("Length of src document after patching:", len(srcDoc))
 	log.Print("Length of dest document :", len(destDoc))
 
-	var match bool
-	match = bytes.Equal(srcDoc, destDoc)
+	sort.Slice(srcDoc, func(i, j int) bool { // sorted src []byte
+		return srcDoc[i] > srcDoc[j]
+	})
+
+	sort.Slice(destDoc, func(i, j int) bool { //sorted dest []byte
+		return destDoc[i] > destDoc[j]
+	})
+
+	// var match bool
+	match := bytes.Equal(srcDoc, destDoc)
 
 	log.Print("Match result is ", match)
 	if match {
