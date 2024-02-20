@@ -1,5 +1,5 @@
-const myURIsource="mongodb+srv://gpi:gpi@rssrc.baelt.mongodb.net/"
-const myURIdestination="mongodb+srv://gpi:gpi@rsdest.baelt.mongodb.net/"
+const myURIsource="mongodb+srv://whos:who@abcde.fghij.mongodb.net/"
+const myURIdestination="mongodb+srv://whos:who@abcde.fghij.mongodb.net/"
 
 const collName="samples"
 const dbName="intsights"

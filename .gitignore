@@ -2,3 +2,5 @@ go.sum
 migration_verifier
 internal/verifier/mongodb_exec/
 verifier_expansion.yml
+
+test/test_comparer/.env
