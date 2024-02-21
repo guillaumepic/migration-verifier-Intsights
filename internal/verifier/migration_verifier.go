@@ -634,13 +634,13 @@ func handleZoneField(
 func (verifier *Verifier) compareOneDocument(srcClientDoc, dstClientDoc bson.Raw, namespace string) ([]VerificationResult, error) {
 
 	// Patching -- GPI
-	//var srcDoc, dstDoc bson.M
+	// var srcDoc, dstDoc bson.M
 	var srcDoc bson.M
 	if err := bson.Unmarshal(srcClientDoc, &srcDoc); err != nil {
 		return nil, err
 	}
 	// if err := bson.Unmarshal(dstClientDoc, &dstClientDoc); err != nil {
-	//     return nil, err
+	// 	return nil, err
 	// }
 
 	handleZoneField(srcDoc)
@@ -652,8 +652,15 @@ func (verifier *Verifier) compareOneDocument(srcClientDoc, dstClientDoc bson.Raw
 	}
 	// dstClientDoc, err = bson.Marshal(dstDoc)
 	// if err != nil {
-	//     return nil, err
+	// 	return nil, err
 	// }
+
+	sort.SliceStable(srcClientDoc, func(i, j int) bool { //sorted src []byte
+		return srcClientDoc[i] > srcClientDoc[j]
+	})
+	sort.SliceStable(dstClientDoc, func(i, j int) bool { // sorted dest []byte
+		return dstClientDoc[i] > dstClientDoc[j]
+	})
 	// Patching GPI - end
 
 	match := bytes.Equal(srcClientDoc, dstClientDoc)
